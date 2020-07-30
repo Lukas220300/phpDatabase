@@ -1,0 +1,24 @@
+{
+    "name": "schoenbeck/phpdatabase",
+    "type": "library",
+    "version": "0.0.1",
+    "description": "Database Connector and Adaptor for php",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Lukas Schönbeck",
+        "role": "Developer"
+      }
+    ],
+    "keywords": ["php","database","adaptor", "database connection", "db"],
+    "homepage": "https://github.com/Lukas220300/phpDatabase",
+    "require-dev": {
+    },
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {
+          "SCHOENBECK\\Database\\" : "src/"
+        }
+      }
+  }
