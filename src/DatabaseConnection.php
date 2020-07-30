@@ -10,7 +10,7 @@ use SCHOENBECK\Database\Exception\DatabaseDriverNotFoundException;
 /**
  * Class DatabaseConnection
  *
- * Needs following configuration in $GLOBALS - variable:
+ * Needs following configuration in $GLOBALS - variable or a DatabaseConfig Object
  * $GLOBALS['GLOBAL_CONFIG']['DB']
  *                                  ['host']
  *                                  ['user']
@@ -18,6 +18,9 @@ use SCHOENBECK\Database\Exception\DatabaseDriverNotFoundException;
  *                                  ['port']
  *                                  ['database']
  *                                  ['driver']
+ * 
+ * If a DatabaseConfig Object is available the configs in $GLOBALS will ignored.
+ * 
  */
 class DatabaseConnection
 {
@@ -54,25 +57,39 @@ class DatabaseConnection
     /**
      * DatabaseConnection constructor.
      */
-    public function __construct()
+    public function __construct($config = null)
     {
-        $this->parseSettings();
+        $this->parseSettings($config);
     }
 
     /**
      * Parse the DB-Setting from the Config to single variable
      */
-    private function parseSettings()
+    private function parseSettings($config)
     {
-        $dbConfig = $GLOBALS['GLOBAL_CONFIG']['DB'];
-
-        $this->host = $dbConfig['host'];
-        $this->user = $dbConfig['user'];
-        $this->password = $dbConfig['password'];
-        $this->port = $dbConfig['port'];
-        $this->database = $dbConfig['database'];
-        $this->driver = $dbConfig['driver'];
-
+        //TODO: Lade Reihenfolge überlegen
+        
+        if(null !== $config) {
+            $this->host = $config->getHost();
+            $this->user = $config->getUser();
+            $this->password = $config->getPassword();
+            $this->port = $config->getPort();
+            $this->database = $config->getDatabase();
+            $this->driver = $config->getDriver();
+            return true;
+        }
+        if(isset($GLOBALS['GLOBAL_CONFIG']['DB'])) {
+            $dbConfig = $GLOBALS['GLOBAL_CONFIG']['DB'];
+            $this->host = $dbConfig['host'];
+            $this->user = $dbConfig['user'];
+            $this->password = $dbConfig['password'];
+            $this->port = $dbConfig['port'];
+            $this->database = $dbConfig['database'];
+            $this->driver = $dbConfig['driver'];
+            return true;
+        }
+        
+        return false;
     }
 
     /**

@@ -1,3 +1,5 @@
 vendor
 .lando.yml
 .dist
+public/*
+public
