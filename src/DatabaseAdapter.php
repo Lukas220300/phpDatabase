@@ -6,7 +6,7 @@ use Exception;
 use mysqli_result;
 use SCHOENBECK\Database\Exception\FieldNotFoundException;
 use SCHOENBECK\Database\Exception\RecordNotFoundException;
-use SCHOENBECK\Database\Exception\SiteNotFoundException;
+use SCHOENBECK\Database\Exception\RecordWithSameUIDException;
 use SCHOENBECK\Database\Exception\TableAlreadyExistException;
 use SCHOENBECK\Database\Exception\TableCanNotCreateException;
 use SCHOENBECK\Database\Exception\TableNotExistException;
@@ -48,7 +48,6 @@ class DatabaseAdapter
         }
 
         $query = QueryBuilder::deleteRowFromTable($tableName, $uid);
-        $this->logger->debug('Execute SQL Query for Method: deleteRowFromTable ##: ' . $query);
         return $this->execQuery($query);
     }
 
@@ -58,7 +57,6 @@ class DatabaseAdapter
             throw new TableNotExistException("Table " . $tableName . " NOT exist.", 1004);
         }
         $query = QueryBuilder::deleteFromTable($tableName, $where);
-        $this->logger->debug('Execute SQL Query for Method: deleteRowFromTable ##: ' . $query);
         return $this->execQuery($query);
     }
 
@@ -76,7 +74,7 @@ class DatabaseAdapter
             if ($size < 1) {
                 return false;
             } else {
-                throw new Exception('There are two records with same uid. Should not be Impossible!');
+                throw new RecordWithSameUIDException('There are two records with same uid. Should not be possible!');
             }
         }
         return true;
@@ -102,7 +100,6 @@ class DatabaseAdapter
             }
         }
         $query = QueryBuilder::updateRowsInFiled($tableName, $values, $where);
-        $this->logger->debug('Execute SQL Query for Method: updateRowInTable ##: ' . $query);
         $result = $this->execQuery($query);
         return $result;
     }
@@ -121,7 +118,6 @@ class DatabaseAdapter
         }
 
         $query = QueryBuilder::insertIntoTable($tableName, $columns, $values);
-        $this->logger->debug('Execute SQL Query for Method: insertIntoTable ##: ' . $query);
         return $this->execQuery($query);
     }
 
@@ -141,7 +137,6 @@ class DatabaseAdapter
         }
 
         $query = QueryBuilder::selectFromTable($tableName, $selectedColumns, $where, $orderBy, $distict);
-        $this->logger->debug('Execute SQL Query for Method: selectFromTable ##: ' . $query);
         $result = $this->execQuery($query);
         return $this->queryResultToArray($result);
     }
@@ -167,7 +162,6 @@ class DatabaseAdapter
         }
 
         $query = QueryBuilder::innerJoin($tableName, $selectedColumns, $tableTwoName, $columnNameTableOne, $columnNameTableTwo, $where, $orderBy);
-        $this->logger->debug('Execute SQL Query for Method: selectFromTable ##: ' . $query);
         $result = $this->execQuery($query);
         return $this->queryResultToArray($result);
     }
@@ -189,7 +183,6 @@ class DatabaseAdapter
         }
 
         $query = QueryBuilder::modifyColumnFromTable($tableName, $newColumnConfiguration);
-        $this->logger->debug('Execute SQL Query for Method: modifyColumnFromTable ##: ' . $query);
         $result = $this->execQuery($query);
         return $this->queryResultToArray($result);
     }
@@ -211,7 +204,6 @@ class DatabaseAdapter
         }
 
         $query = QueryBuilder::dropColumnFromTable($tableName, $columnName);
-        $this->logger->debug('Execute SQL Query for Method: dropColumnFromTable ##: ' . $query);
         return $this->execQuery($query);
     }
 
@@ -243,7 +235,6 @@ class DatabaseAdapter
             throw new TableNotExistException("Table " . $tableName . " NOT exist.", 1004);
         }
         $query = QueryBuilder::getFieldsOfTable($tableName);
-        $this->logger->debug('Execute SQL Query for Method: getFieldsOfTable ##: ' . $query);
         $result = $this->execQuery($query);
         return $this->queryResultToArray($result);
     }
@@ -259,7 +250,6 @@ class DatabaseAdapter
             throw new TableNotExistException("Table " . $tableName . " NOT exist.", 1004);
         }
         $query = QueryBuilder::getTableStructure($tableName);
-        $this->logger->debug('Execute SQL Query for Method: getTableStructure ##: ' . $query);
         return $this->queryResultToArray($this->execQuery($query));
     }
 
@@ -276,7 +266,6 @@ class DatabaseAdapter
         }
 
         $query = QueryBuilder::addColumnToTable($tableName, $column);
-        $this->logger->debug('Execute SQL Query for Method: addColumnToTable ##: ' . $query);
         return $this->execQuery($query);
     }
 
@@ -292,7 +281,6 @@ class DatabaseAdapter
             throw new TableNotExistException("Table " . $tableNameOld . " NOT exist.", 1004);
         }
         $query = QueryBuilder::renameTable($tableNameOld, $tableNameNew);
-        $this->logger->debug('Execute SQL Query for Method: renameTable ##: ' . $query);
         return $this->execQuery($query);
     }
 
@@ -307,7 +295,6 @@ class DatabaseAdapter
             throw new TableNotExistException("Table " . $tableName . " NOT exist.", 1004);
         }
         $query = QueryBuilder::dropTable($tableName);
-        $this->logger->debug('Execute SQL Query for Method: dropTable ##: ' . $query);
         return $this->execQuery($query);
     }
 
@@ -323,7 +310,6 @@ class DatabaseAdapter
             throw new TableAlreadyExistException("Table " . $tableName . " already exist.", 1002);
         }
         $query = QueryBuilder::creatTableNotExist($tableName, $fileds);
-        $this->logger->debug('Execute SQL Query for Method: creatTable ##: ' . $query);
         $result = $this->execQuery($query);
         if (!$result) {
             throw new TableCanNotCreateException("Tabel can not create. Pleas check your configuration or the connection to Database. ", 1003);
@@ -356,7 +342,6 @@ class DatabaseAdapter
     public function showTables()
     {
         $query = QueryBuilder::showTables();
-        $this->logger->debug('Execute SQL Query for Method: showTables ##: ' . $query);
         $result = $this->execQuery($query);
         return $this->queryResultToArray($result);
     }
@@ -386,9 +371,7 @@ class DatabaseAdapter
         try {
             return $this->databaseConnection->execSQLStatement($query);
         } catch (Exception $exception) {
-            //TODO: Exception handling
-            echo "####### ERROR ######";
-            echo $exception->getTraceAsString();
+            throw $exception;
         }
         return null;
     }
@@ -426,7 +409,6 @@ class DatabaseAdapter
                 array_push($values, self::addQuotationMarks($parameter[$key]));
             }
         }
-
         return ['columns' => $columns, 'values' => $values];
     }
 
