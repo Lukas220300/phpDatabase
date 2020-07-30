@@ -26,9 +26,12 @@ class DatabaseAdapter
      * DatabaseAdapter constructor.
      * @throws Exception
      */
-    public function __construct()
+    public function __construct($connection = null)
     {
-        $this->databaseConnection = new DatabaseConnection();
+        $this->databaseConnection = $connection;
+        if(null === $this->databaseConnection) {
+            $this->databaseConnection = new DatabaseConnection();
+        }
     }
 
     /**
