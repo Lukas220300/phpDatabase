@@ -6,6 +6,7 @@ use Exception;
 use mysqli_result;
 use SCHOENBECK\Database\Exception\FieldNotFoundException;
 use SCHOENBECK\Database\Exception\RecordNotFoundException;
+use SCHOENBECK\Database\Exception\RecordWithSameUIDException;
 use SCHOENBECK\Database\Exception\TableAlreadyExistException;
 use SCHOENBECK\Database\Exception\TableCanNotCreateException;
 use SCHOENBECK\Database\Exception\TableNotExistException;
@@ -73,7 +74,7 @@ class DatabaseAdapter
             if ($size < 1) {
                 return false;
             } else {
-                throw new Exception('There are two records with same uid. Should not be Impossible!');
+                throw new RecordWithSameUIDException('There are two records with same uid. Should not be possible!');
             }
         }
         return true;
@@ -408,7 +409,6 @@ class DatabaseAdapter
                 array_push($values, self::addQuotationMarks($parameter[$key]));
             }
         }
-
         return ['columns' => $columns, 'values' => $values];
     }
 
