@@ -1,7 +1,7 @@
 {
     "name": "schoenbeck/phpdatabase",
     "type": "library",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Database Connector and Adaptor for php",
     "license": "MIT",
     "authors": [
