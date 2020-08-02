@@ -2,6 +2,8 @@
 
 namespace SCHOENBECK\Database;
 
+use function PHPSTORM_META\type;
+
 /**
  * Class QueryBuilder
  */
@@ -192,9 +194,9 @@ class QueryBuilder
      * @param $newColumnConfiguration
      * @return string
      */
-    public static function modifyColumnFromTable($tableName, $newColumnConfiguration)
+    public static function alterColumnFromTable($tableName, $columnName, $newColumnConfiguration)
     {
-        $query = 'ALTER TABLE ' . $tableName . ' MODIFY ' . QueryBuilder::createColumnLine($newColumnConfiguration) . ';';
+        $query = 'ALTER TABLE ' . $tableName . ' MODIFY ' . QueryBuilder::createColumnLine($columnName, $newColumnConfiguration) . ';';
         return $query;
     }
 
@@ -241,9 +243,9 @@ class QueryBuilder
      * @param $column
      * @return string
      */
-    public static function addColumnToTable($tableName, $column)
+    public static function addColumnToTable($tableName, $columnName, $columnConfig)
     {
-        $query = 'Alter Table ' . $tableName . ' ADD ' . QueryBuilder::createColumnLine($column) . ';';
+        $query = 'Alter Table ' . $tableName . ' ADD ' . QueryBuilder::createColumnLine($columnName, $columnConfig) . ';';
         return $query;
     }
 
@@ -261,7 +263,7 @@ class QueryBuilder
      * @param $tableName
      * @return string
      */
-    public static function dropTable($tableName)
+    public static function removeTable($tableName)
     {
         return 'DROP TABLE `' . $tableName . '`';
     }
@@ -269,63 +271,70 @@ class QueryBuilder
     /**
      * Default added is uid
      *
-     * [
-     *  '0' => [
-     *      'name' => 'lalal',
-     *      'type' => 'int(11)',
-     *      'unsigned' => false,
-     *      'notnull' => true,
-     *      'default' => true,
-     *      'd-value' => '0'
-     *  ]
-     * ]
      *
      * @param string $tableName
-     * @param array $fileds
+     * @param array $columns
      * @return string
      */
-    public static function creatTableNotExist($tableName = '', array $fileds = [])
+    public static function createTableNotExist($tableName = '', array $columns = [])
     {
-
         $query = 'CREATE TABLE `' . $tableName . '` (';
-        $query .= QueryBuilder::getDefaultTableFileds();
-
-        if (count($fileds) != 0) {
-            foreach ($fileds as $filed) {
+        $query .= QueryBuilder::getDefaultTableColumn();
+        if (count($columns) != 0) {
+            foreach ($columns as $columnName => $columnConfig) {
                 $query .= ", ";
-                $query .= QueryBuilder::createColumnLine($filed);
+                $query .= QueryBuilder::createColumnLine($columnName, $columnConfig);
             }
         }
         $query .= ' );';
-
         return $query;
     }
 
     /**
-     * @param $filed
      * @return string
      */
-    private static function createColumnLine($filed)
+    private static function createColumnLine($columnName, $columnConfig)
     {
         $query = "";
-        $query .= '`' . $filed['name'] . '` ' . $filed['type'];
-        if ($filed['unsigned']) {
-            $query .= ' unsigned';
+        $query .= '`' . $columnName . '` ' . $columnConfig['type'];
+
+        if(isset($columnConfig['unsigned'])) {
+            if(1 === $columnConfig['unsigned']) {
+                $query .= ' unsigned';
+            }
         }
-        if ($filed['notnull']) {
-            $query .= ' NOT NULL';
+        if(isset($columnConfig['notNull'])) {
+            if(1 === $columnConfig['notNull']) {
+                $query .= ' NOT NULL';
+            }
         }
-        if ($filed['default']) {
-            $query .= ' DEFAULT ' . $filed['d-value'];
+        if(isset($columnConfig['autoIncrement'])) {
+            if(1 === $columnConfig['autoIncrement']) {
+                $query .= ' AUTO_INCREMENT';
+            }
+        }
+        if(isset($columnConfig['default'])) {
+            if('boolean' === $columnConfig['type']) {
+                $columnConfig['default'] = QueryBuilder::convertToBooleanString($columnConfig['default']);
+            }
+            $query .= ' DEFAULT ' . $columnConfig['default'];
         }
         return $query;
+    }
+
+    private static function convertToBooleanString($value) {
+        if($value) {
+            return 'true';
+        } else {
+            return 'false';
+        }
     }
 
     /**
      * Get the default Table fields for every Table
      * @return string
      */
-    private static function getDefaultTableFileds()
+    private static function getDefaultTableColumn()
     {
         return QueryBuilder::getDefaultUID() . QueryBuilder::getDefaultPrimaryKey();
     }
