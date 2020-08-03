@@ -1,8 +1,8 @@
 {
     "name": "schoenbeck/phpdatabase",
     "type": "library",
-    "version": "1.0.1",
-    "description": "Database Connector and Adaptor for php",
+    "version": "2.0.0",
+    "description": "Database Connector, Adaptor and Configurator for php",
     "license": "MIT",
     "authors": [
       {
@@ -10,11 +10,12 @@
         "role": "Developer"
       }
     ],
-    "keywords": ["php","database","adaptor", "database connection", "db"],
+    "keywords": ["php","database","adaptor", "database connection", "db", "configurator", "yaml", "yml"],
     "homepage": "https://github.com/Lukas220300/phpDatabase",
     "require-dev": {
     },
     "require": {
+        "symfony/yaml": "^5.1"
     },
     "autoload": {
         "psr-4": {

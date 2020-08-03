@@ -54,6 +54,10 @@ class DatabaseAdapter
         return $this->execQuery($query);
     }
 
+    /**
+     * @param $tableName
+     * @param $where
+     */
     public function deleteFromTable($tableName, $where)
     {
         if (!$this->checkIfTableExist($tableName)) {
@@ -176,16 +180,19 @@ class DatabaseAdapter
      * @throws FieldNotFoundException
      * @throws TableNotExistException
      */
-    public function modifyColumnFromTable($tableName, $newColumnConfiguration)
+    public function alterColumnFromTable($tableName, $columnName, $newColumnConfiguration, bool $dryRun = false)
     {
         if (!$this->checkIfTableExist($tableName)) {
             throw new TableNotExistException("Table " . $tableName . " NOT exist.", 1004);
         }
-        if (!$this->checkIfFiledExitsInTable($tableName, $newColumnConfiguration['name'])) {
-            throw new FieldNotFoundException("Filed " . $newColumnConfiguration['name'] . " NOT exist in table " . $tableName, 1005);
+        if (!$this->checkIfFiledExitsInTable($tableName, $columnName)) {
+            throw new FieldNotFoundException("Filed " . $columnName . " NOT exist in table " . $tableName, 1005);
         }
 
-        $query = QueryBuilder::modifyColumnFromTable($tableName, $newColumnConfiguration);
+        $query = QueryBuilder::alterColumnFromTable($tableName, $columnName, $newColumnConfiguration);
+        if($dryRun) {
+            return $query;
+        }
         $result = $this->execQuery($query);
         return $this->queryResultToArray($result);
     }
@@ -197,7 +204,7 @@ class DatabaseAdapter
      * @throws FieldNotFoundException
      * @throws TableNotExistException
      */
-    public function dropColumnFromTable($tableName, $columnName)
+    public function removeColumnFromTable($tableName, $columnName, bool $dryRun = false)
     {
         if (!$this->checkIfTableExist($tableName)) {
             throw new TableNotExistException("Table " . $tableName . " NOT exist.", 1004);
@@ -205,8 +212,10 @@ class DatabaseAdapter
         if (!$this->checkIfFiledExitsInTable($tableName, $columnName)) {
             throw new FieldNotFoundException("Filed " . $columnName . " NOT exist in table " . $tableName, 1005);
         }
-
         $query = QueryBuilder::dropColumnFromTable($tableName, $columnName);
+        if($dryRun) {
+            return $query;
+        }
         return $this->execQuery($query);
     }
 
@@ -262,13 +271,15 @@ class DatabaseAdapter
      * @return array|bool|mysqli_result|null
      * @throws TableNotExistException
      */
-    public function addColumnToTable($tableName, $column)
+    public function addColumnToTable($tableName, $columnName, $columnConfig, bool $dryRun = false)
     {
         if (!$this->checkIfTableExist($tableName)) {
             throw new TableNotExistException("Table " . $tableName . " NOT exist.", 1004);
         }
-
-        $query = QueryBuilder::addColumnToTable($tableName, $column);
+        $query = QueryBuilder::addColumnToTable($tableName, $columnName, $columnConfig);
+        if($dryRun) {
+            return $query;
+        }
         return $this->execQuery($query);
     }
 
@@ -292,12 +303,15 @@ class DatabaseAdapter
      * @return array|bool|mysqli_result|null
      * @throws TableNotExistException
      */
-    public function dropTable($tableName)
+    public function removeTable($tableName, bool $dryRun = false)
     {
         if (!$this->checkIfTableExist($tableName)) {
             throw new TableNotExistException("Table " . $tableName . " NOT exist.", 1004);
         }
-        $query = QueryBuilder::dropTable($tableName);
+        $query = QueryBuilder::removeTable($tableName);
+        if($dryRun) {
+            return $query;
+        }
         return $this->execQuery($query);
     }
 
@@ -307,15 +321,18 @@ class DatabaseAdapter
      * @throws TableAlreadyExistException
      * @throws TableCanNotCreateException
      */
-    public function createTable($tableName = '', array $fileds = [])
+    public function createTable($tableName = '', array $columns = [], bool $dryRun = false)
     {
         if ($this->checkIfTableExist($tableName)) {
             throw new TableAlreadyExistException("Table " . $tableName . " already exist.", 1002);
         }
-        $query = QueryBuilder::creatTableNotExist($tableName, $fileds);
+        $query = QueryBuilder::createTableNotExist($tableName, $columns);
+        if($dryRun) {
+            return $query;
+        }
         $result = $this->execQuery($query);
         if (!$result) {
-            throw new TableCanNotCreateException("Tabel can not create. Pleas check your configuration or the connection to Database. ", 1003);
+            throw new TableCanNotCreateException("Table can not create. Pleas check your configuration or the connection to Database. ", 1003);
         }
     }
 
@@ -395,11 +412,17 @@ class DatabaseAdapter
         $this->databaseConnection = $databaseConnection;
     }
 
+    /**
+     * @param $value
+     */
     private static function addQuotationMarks($value)
     {
         return "'" . $value . "'";
     }
 
+    /**
+     * @param $parameter
+     */
     public static function splitParameterToColumnAndValue($parameter)
     {
         $columns = [];
