@@ -54,6 +54,10 @@ class DatabaseAdapter
         return $this->execQuery($query);
     }
 
+    /**
+     * @param $tableName
+     * @param $where
+     */
     public function deleteFromTable($tableName, $where)
     {
         if (!$this->checkIfTableExist($tableName)) {
@@ -408,11 +412,17 @@ class DatabaseAdapter
         $this->databaseConnection = $databaseConnection;
     }
 
+    /**
+     * @param $value
+     */
     private static function addQuotationMarks($value)
     {
         return "'" . $value . "'";
     }
 
+    /**
+     * @param $parameter
+     */
     public static function splitParameterToColumnAndValue($parameter)
     {
         $columns = [];
