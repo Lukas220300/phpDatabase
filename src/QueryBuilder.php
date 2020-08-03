@@ -20,6 +20,10 @@ class QueryBuilder
         return QueryBuilder::deleteFromTable($tableName, "uid=" . $uid);
     }
 
+    /**
+     * @param $tableName
+     * @param $where
+     */
     public static function deleteFromTable($tableName, $where)
     {
         return "DELETE FROM " . $tableName . " WHERE " . $where . ";";
@@ -76,6 +80,11 @@ class QueryBuilder
         return "SHOW TABLES;";
     }
 
+    /**
+     * @param $tableName
+     * @param $columns
+     * @param $values
+     */
     public static function insertIntoTable($tableName, array $columns = ['empty' => true], array $values)
     {
         $query = "INSERT INTO";
@@ -322,6 +331,9 @@ class QueryBuilder
         return $query;
     }
 
+    /**
+     * @param $value
+     */
     private static function convertToBooleanString($value) {
         if($value) {
             return 'true';
