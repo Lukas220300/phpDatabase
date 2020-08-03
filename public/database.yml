@@ -5,13 +5,14 @@ tables:
             default: 
         lastName:
             type: varchar(50)
-            default:
+            default: "\"n\""
+            notNull: true
         gender:
             type: varchar(1)
             default: "\"n\""
         birthday:
             type: varchar(50)
-            default:
+            default: "\"n\""
         userName:
             type: varchar(100)
             notNull: true
@@ -24,6 +25,7 @@ tables:
         lastLogin:
             type: varchar(50)
             default:
+            notNull: true
         active:
             type: boolean
             default: true

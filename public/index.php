@@ -23,6 +23,6 @@ $adaptor = new DatabaseAdapter($connection);
 
 $dbConfig = new DatabaseConfigurator($adaptor);
 
-$result = $dbConfig->checkDatabaseConfigYamlFile("./database.yml");
+$result = $dbConfig->checkDatabaseConfigYamlFile("./database.yml", true);
 
 print_r($result);
