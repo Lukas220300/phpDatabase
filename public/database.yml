@@ -1,0 +1,29 @@
+tables:
+    User:
+        firstName:
+            type: varchar(50)
+            default: 
+        lastName:
+            type: varchar(50)
+            default:
+        gender:
+            type: varchar(1)
+            default: "\"n\""
+        birthday:
+            type: varchar(50)
+            default:
+        userName:
+            type: varchar(100)
+            notNull: true
+        password:
+            type: varchar(200)
+            notNull: true
+        createDate:
+            type: varchar(50)
+            default:
+        lastLogin:
+            type: varchar(50)
+            default:
+        active:
+            type: boolean
+            default: true
