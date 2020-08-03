@@ -181,8 +181,8 @@ class DatabaseAdapter
         if (!$this->checkIfTableExist($tableName)) {
             throw new TableNotExistException("Table " . $tableName . " NOT exist.", 1004);
         }
-        if (!$this->checkIfFiledExitsInTable($tableName, $newColumnConfiguration['name'])) {
-            throw new FieldNotFoundException("Filed " . $newColumnConfiguration['name'] . " NOT exist in table " . $tableName, 1005);
+        if (!$this->checkIfFiledExitsInTable($tableName, $columnName)) {
+            throw new FieldNotFoundException("Filed " . $columnName . " NOT exist in table " . $tableName, 1005);
         }
 
         $query = QueryBuilder::alterColumnFromTable($tableName, $columnName, $newColumnConfiguration);

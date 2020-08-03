@@ -54,10 +54,7 @@ class DatabaseConfigurator
     }
     private function createTable($tableName, $config)
     {
-        if(!$this->dryRun) {
-            $this->databaseAdaptor->createTable($tableName, $config);
-        }
-        $this->dryRunResult[] = $this->databaseAdaptor->createTable($tableName,$config, true);
+        $this->dryRunResult[] = $this->databaseAdaptor->createTable($tableName,$config, $this->dryRun);
     }
 
     private function compareConfigFromFileWithDatabase($tableName, $tableConfig, $configDB)
@@ -73,10 +70,7 @@ class DatabaseConfigurator
                 }
             }
             if(null === $columnDbConfig) {
-                if(!$this->dryRun) {
-                    $this->databaseAdaptor->addColumnToTable($tableName, $columnName, $columnConfig);
-                }
-                $this->dryRunResult[] = $this->databaseAdaptor->addColumnToTable($tableName, $columnName, $columnConfig, true);
+                $this->dryRunResult[] = $this->databaseAdaptor->addColumnToTable($tableName, $columnName, $columnConfig, $this->dryRun);
             } else {
                 $this->checkColumnConfiguration($tableName, $columnName, $columnConfig, $columnDbConfig);
             }
@@ -117,10 +111,7 @@ class DatabaseConfigurator
         }
 
         if($changeColumnConfiguration) {
-            if(!$this->dryRun) {
-                $this->databaseAdaptor->alterColumnFromTable($tableName, $columnName, $columnConfig);
-            }
-            $this->dryRunResult[] = $this->databaseAdaptor->alterColumnFromTable($tableName, $columnName, $columnConfig, true);
+            $this->dryRunResult[] = $this->databaseAdaptor->alterColumnFromTable($tableName, $columnName, $columnConfig, $this->dryRun);
         }
 
     }
@@ -158,10 +149,7 @@ class DatabaseConfigurator
             $columnName = $column['COLUMN_NAME'];
             if('uid' !== $columnName) {
                 if(!in_array($columnName, $columns)) {
-                    if(!$this->dryRun) {
-                        $this->databaseAdaptor->removeColumnFromTable($tableName, $columnName);
-                    }
-                    $this->dryRunResult[] = $this->databaseAdaptor->removeColumnFromTable($tableName, $columnName, true);
+                    $this->dryRunResult[] = $this->databaseAdaptor->removeColumnFromTable($tableName, $columnName, $this->dryRun);
                 }
             }
         }
@@ -172,10 +160,7 @@ class DatabaseConfigurator
         $databaseTables = $this->databaseAdaptor->showTables();
         foreach($databaseTables as $table) {
             if(!in_array($table['Tables_in_lamp'], $tables)) {
-                if(!$this->dryRun) {
-                    $this->databaseAdaptor->removeTable($table['Tables_in_lamp']);
-                }
-                $this->dryRunResult[] = $this->databaseAdaptor->removeTable($table['Tables_in_lamp'], true);
+                $this->dryRunResult[] = $this->databaseAdaptor->removeTable($table['Tables_in_lamp'], $this->dryRun);
             }
         }
     }
