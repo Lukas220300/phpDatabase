@@ -114,6 +114,9 @@ class QueryBuilder
     private static function addQuotationMarksIfNeeded($value)
     {
         $type = gettype($value);
+        if('""' === $value) {
+            return $value;
+        }
         if('string' === $type) {
             return QueryBuilder::addQuotationMarks($value);
         }
