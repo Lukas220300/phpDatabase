@@ -38,7 +38,7 @@ class QueryBuilder
     public static function updateRowsInFiled($tableName, array $values, $whereCondition)
     {
         $query = "UPDATE " . $tableName . " SET ";
-        $query .= QueryBuilder::getSetsForUpdateRows($values);
+        $query .= self::getSetsForUpdateRows($values);
         if ($whereCondition !== '/') {
             $query .= " WHERE " . $whereCondition;
         }
@@ -54,9 +54,9 @@ class QueryBuilder
         $result = "";
         foreach (array_keys($values) as $columnName) {
             if ($result === "") {
-                $result .= QueryBuilder::getSetValueForOneColumn($columnName, $values[$columnName]);
+                $result .= self::getSetValueForOneColumn($columnName, $values[$columnName]);
             } else {
-                $result .= ", " . QueryBuilder::getSetValueForOneColumn($columnName, $values[$columnName]);
+                $result .= ", " . self::getSetValueForOneColumn($columnName, $values[$columnName]);
             }
         }
         return $result;
@@ -69,7 +69,7 @@ class QueryBuilder
      */
     private static function getSetValueForOneColumn($columnName, $value)
     {
-        return $columnName . "=" . self::addQuotationMarks($value);
+        return $columnName . "=" . self::addQuotationMarksIfNeeded($value);
     }
 
     /**
@@ -106,7 +106,7 @@ class QueryBuilder
     {
         $result = "( null";
         foreach ($values as $value) {
-            $result .= ", " . QueryBuilder::addQuotationMarksIfNeeded($value);
+            $result .= ", " . self::addQuotationMarksIfNeeded($value);
         }
         return $result . " )";
     }
@@ -118,7 +118,7 @@ class QueryBuilder
             return $value;
         }
         if('string' === $type) {
-            return QueryBuilder::addQuotationMarks($value);
+            return self::addQuotationMarks($value);
         }
         return $value;
     }
@@ -150,7 +150,7 @@ class QueryBuilder
         if ($distict) {
             $query .= " DISTINCT";
         }
-        $query .= QueryBuilder::getColumnsForSelect($selectedColumns);
+        $query .= self::getColumnsForSelect($selectedColumns);
         $query .= " FROM";
         $query .= " " . $tableName;
         if ($where !== '') {
@@ -176,7 +176,7 @@ class QueryBuilder
     public static function innerJoin($tableName, array $selectedColumns = ['0' => '*'], $tableTwoName, $columnNameTableOne, $columnNameTableTwo, $where = '', $orderBy = '')
     {
         $query = "SELECT";
-        $query .= QueryBuilder::getColumnsForSelect($selectedColumns);
+        $query .= self::getColumnsForSelect($selectedColumns);
         $query .= " FROM";
         $query .= " " . $tableName;
         $query .= " INNER JOIN ";
@@ -217,7 +217,7 @@ class QueryBuilder
      */
     public static function alterColumnFromTable($tableName, $columnName, $newColumnConfiguration)
     {
-        $query = 'ALTER TABLE ' . $tableName . ' MODIFY ' . QueryBuilder::createColumnLine($columnName, $newColumnConfiguration) . ';';
+        $query = 'ALTER TABLE ' . $tableName . ' MODIFY ' . self::createColumnLine($columnName, $newColumnConfiguration) . ';';
         return $query;
     }
 
