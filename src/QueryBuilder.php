@@ -106,9 +106,18 @@ class QueryBuilder
     {
         $result = "( null";
         foreach ($values as $value) {
-            $result .= ", " . $value;
+            $result .= ", " . QueryBuilder::addQuotationMarksIfNeeded($value);
         }
         return $result . " )";
+    }
+
+    private static function addQuotationMarksIfNeeded($value)
+    {
+        $type = gettype($value);
+        if('string' === $type) {
+            return QueryBuilder::addQuotationMarks($value);
+        }
+        return $value;
     }
 
     /**
