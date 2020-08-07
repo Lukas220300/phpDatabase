@@ -42,6 +42,7 @@ class QueryBuilder
         if ($whereCondition !== '/') {
             $query .= " WHERE " . $whereCondition;
         }
+        $query .= ";";
         return $query;
     }
 
